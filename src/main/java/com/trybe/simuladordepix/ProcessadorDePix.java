@@ -22,14 +22,16 @@ public class ProcessadorDePix {
    *         o servidor na nuvem.
    */
   public void executarPix(int valor, String chave) throws ErroDePix, IOException {
-    // TODO: Implementar.
+
     Conexao conexao = servidor.abrirConexao();
     try {
       verificarErros(valor, chave);
       String mensagemDeRetorno = conexao.enviarPix(valor, chave);
+
       if (mensagemDeRetorno == "sucesso") {
         return;
       }
+
       if (mensagemDeRetorno == "saldo_insuficiente") {
         throw new ErroSaldoInsuficiente();
       } else if (mensagemDeRetorno == "chave_pix_nao_encontrada") {
