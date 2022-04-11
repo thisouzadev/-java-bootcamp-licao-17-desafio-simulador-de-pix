@@ -23,11 +23,22 @@ public class ProcessadorDePix {
    */
   public void executarPix(int valor, String chave) throws ErroDePix, IOException {
     // TODO: Implementar.
+    Conexao conexao = servidor.abrirConexao();
     try {
       verificarErros(valor, chave);
-
+      String mensagemDeRetorno = conexao.enviarPix(valor, chave);
+      if (mensagemDeRetorno == "sucesso") {
+        return;
+      }
+      if (mensagemDeRetorno == "saldo_insuficiente") {
+        throw new ErroSaldoInsuficiente();
+      } else if (mensagemDeRetorno == "chave_pix_nao_encontrada") {
+        throw new ErroChaveNaoEncontrada();
+      } else {
+        throw new ErroInterno();
+      }
     } finally {
-      servidor.abrirConexao().close();
+      conexao.close();
     }
   }
 
@@ -35,13 +46,12 @@ public class ProcessadorDePix {
    * Método do desafio.
    * 
    */
-  public boolean verificarErros(double valorEmCentavos, String chave) throws ErroDePix {
-    if (valorEmCentavos < 0) {
+  public void verificarErros(int valorEmCentavos, String chave) throws ErroDePix {
+    if (valorEmCentavos <= 0) {
       throw new ErroValorNaoPositivo();
     }
     if (chave.isBlank()) {
       throw new ErroChaveEmBranco();
     }
-    return true;
   }
 }
